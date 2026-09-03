@@ -1,0 +1,273 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%">
+  <defs>
+    <filter id="paper-texture" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.02 0" />
+      <feComposite in2="SourceGraphic" in="glare" operator="atop" />
+    </filter>
+  </defs>
+
+  <!-- Clean off-white test paper background -->
+  <rect width="960" height="560" fill="#ffffff" />
+
+  <!-- Outer test box border matching Cambridge exam booklet -->
+  <rect x="12" y="12" width="936" height="536" fill="none" stroke="#222222" stroke-width="1.8" />
+
+  <!-- Diagram Title -->
+  <text x="480" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="800" fill="#111827" text-anchor="middle" letter-spacing="-0.5">
+    A model of an acrocanthosaurus
+  </text>
+
+  <!-- DINOSAUR ILLUSTRATION GROUP -->
+  <g id="acrocanthosaurus-drawing" transform="translate(10, 0)">
+    <!-- Shadow beneath feet -->
+    <ellipse cx="440" cy="465" rx="260" ry="12" fill="#f1f5f9" />
+
+    <!-- Tail body fill and outline -->
+    <path d="M 65 352 Q 130 338 210 326 Q 300 312 390 285 Q 460 262 505 250 L 515 285 Q 460 305 390 320 Q 300 335 210 348 Q 130 358 65 352 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2" stroke-linejoin="round" />
+
+    <!-- Tail dorsal segmented spines ridge (running to tip) -->
+    <path d="M 65 352 
+             C 80 348, 100 342, 120 338
+             C 140 334, 160 330, 180 324
+             C 200 318, 220 312, 240 305
+             C 260 298, 280 290, 300 280
+             C 320 270, 340 260, 360 250
+             C 380 240, 400 230, 420 220
+             C 440 212, 460 205, 480 200
+             C 500 196, 520 194, 545 194"
+          fill="none" stroke="#0f172a" stroke-width="2" />
+
+    <!-- Spines Ridge Outline (Top arch of high neural spines) -->
+    <path d="M 445 235 
+             C 450 215, 465 198, 485 192 
+             C 515 184, 560 180, 615 180 
+             C 670 180, 725 185, 780 202 
+             C 805 212, 825 228, 835 245 
+             L 810 262
+             C 795 248, 770 238, 740 232
+             C 690 224, 630 222, 575 225
+             C 525 228, 485 238, 455 252 Z" 
+          fill="#f8fafc" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round" />
+
+    <!-- Segmented spine vertical separation ribs -->
+    <g stroke="#334155" stroke-width="1.4" stroke-linecap="round">
+      <line x1="100" y1="344" x2="100" y2="352" />
+      <line x1="120" y1="339" x2="120" y2="348" />
+      <line x1="140" y1="334" x2="140" y2="344" />
+      <line x1="160" y1="329" x2="160" y2="340" />
+      <line x1="180" y1="324" x2="180" y2="336" />
+      <line x1="200" y1="318" x2="200" y2="331" />
+      <line x1="220" y1="311" x2="220" y2="326" />
+      <line x1="240" y1="304" x2="240" y2="320" />
+      <line x1="260" y1="297" x2="260" y2="315" />
+      <line x1="280" y1="289" x2="280" y2="308" />
+      <line x1="300" y1="280" x2="300" y2="301" />
+      <line x1="320" y1="270" x2="320" y2="294" />
+      <line x1="340" y1="260" x2="340" y2="286" />
+      <line x1="360" y1="249" x2="360" y2="278" />
+      <line x1="380" y1="239" x2="380" y2="270" />
+      <line x1="400" y1="229" x2="400" y2="262" />
+      <line x1="420" y1="220" x2="420" y2="254" />
+      <line x1="440" y1="212" x2="440" y2="248" />
+      <line x1="460" y1="205" x2="460" y2="243" />
+      <line x1="480" y1="198" x2="480" y2="238" />
+      <line x1="500" y1="192" x2="500" y2="235" />
+      <line x1="520" y1="187" x2="520" y2="232" />
+      <line x1="540" y1="184" x2="540" y2="230" />
+      <line x1="560" y1="182" x2="560" y2="229" />
+      <line x1="580" y1="181" x2="580" y2="228" />
+      <line x1="600" y1="181" x2="600" y2="228" />
+      <line x1="620" y1="182" x2="620" y2="229" />
+      <line x1="640" y1="184" x2="640" y2="231" />
+      <line x1="660" y1="188" x2="660" y2="234" />
+      <line x1="680" y1="192" x2="680" y2="238" />
+      <line x1="700" y1="198" x2="700" y2="242" />
+      <line x1="720" y1="204" x2="720" y2="248" />
+      <line x1="740" y1="212" x2="740" y2="254" />
+      <line x1="760" y1="222" x2="760" y2="260" />
+      <line x1="780" y1="234" x2="780" y2="266" />
+      <line x1="800" y1="248" x2="800" y2="272" />
+    </g>
+
+    <!-- Main Torso & Belly -->
+    <path d="M 500 240
+             C 485 270, 480 320, 510 355
+             C 530 380, 565 395, 610 398
+             C 655 400, 700 375, 730 330
+             C 745 305, 755 270, 750 245
+             Z"
+          fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+
+    <!-- Ribs and skin contour shading on torso -->
+    <g stroke="#64748b" stroke-width="1" stroke-linecap="round">
+      <path d="M 560 300 Q 570 330 580 350" />
+      <path d="M 585 295 Q 598 328 610 352" />
+      <path d="M 610 290 Q 625 325 638 350" />
+      <path d="M 635 288 Q 652 322 665 345" />
+      <path d="M 660 285 Q 675 315 688 338" />
+      <!-- Skin fold creases -->
+      <path d="M 515 320 Q 530 345 545 365" />
+      <path d="M 505 340 Q 520 360 535 375" />
+    </g>
+
+    <!-- Left (back) Hind Leg -->
+    <g fill="#f1f5f9" stroke="#0f172a" stroke-width="2" stroke-linejoin="round">
+      <path d="M 440 270
+               C 420 290, 410 330, 420 365
+               C 425 385, 435 410, 435 435
+               L 420 445 L 405 452 L 400 458 L 415 458 L 430 455 L 450 442
+               C 455 425, 455 395, 450 370
+               C 445 345, 455 315, 470 290 Z" />
+      <!-- Left Foot Claws -->
+      <path d="M 405 452 Q 395 455 390 460 Q 402 462 415 458 Z" fill="#0f172a" />
+      <path d="M 418 456 Q 410 462 406 468 Q 418 467 428 460 Z" fill="#0f172a" />
+    </g>
+
+    <!-- Right (primary forward) Muscular Hind Leg -->
+    <g fill="#ffffff" stroke="#0f172a" stroke-width="2.2" stroke-linejoin="round">
+      <!-- Big muscular thigh -->
+      <path d="M 470 275
+               C 455 300, 455 330, 470 360
+               C 485 390, 515 425, 525 450
+               C 530 465, 532 478, 525 490
+               L 505 502 L 490 510 L 485 518 L 510 515 L 535 505 L 555 480
+               C 560 455, 555 420, 545 390
+               C 535 360, 545 320, 560 290
+               C 540 275, 505 270, 470 275 Z" />
+      <!-- Muscle tone lines -->
+      <path d="M 480 320 Q 500 350 515 390" fill="none" stroke="#64748b" stroke-width="1.2" />
+      <path d="M 505 310 Q 525 345 538 385" fill="none" stroke="#64748b" stroke-width="1.2" />
+      <path d="M 520 425 Q 528 450 528 475" fill="none" stroke="#64748b" stroke-width="1.2" />
+
+      <!-- Powerful Forward Claws -->
+      <!-- Claw 1 -->
+      <path d="M 490 510 Q 470 515 460 522 Q 475 524 495 516 Z" fill="#0f172a" stroke="#0f172a" stroke-width="1" />
+      <!-- Claw 2 (middle talon) -->
+      <path d="M 495 516 Q 480 525 472 535 Q 492 532 508 520 Z" fill="#0f172a" stroke="#0f172a" stroke-width="1" />
+      <!-- Claw 3 -->
+      <path d="M 508 520 Q 498 532 492 542 Q 510 537 525 522 Z" fill="#0f172a" stroke="#0f172a" stroke-width="1" />
+      <!-- Dewclaw behind ankle -->
+      <path d="M 538 485 Q 548 490 552 496 Q 545 498 535 492 Z" fill="#0f172a" stroke="#0f172a" stroke-width="1" />
+    </g>
+
+    <!-- Small Theropod Forelimbs (Arms) with 3 sharp claws -->
+    <g fill="#ffffff" stroke="#0f172a" stroke-width="1.8" stroke-linejoin="round">
+      <!-- Upper arm & forearm -->
+      <path d="M 700 330 
+               C 720 340, 740 355, 755 370 
+               C 765 380, 775 382, 782 376 
+               L 772 368 
+               C 760 355, 745 340, 730 328 Z" />
+      <!-- 3 Hand Claws -->
+      <path d="M 782 376 Q 795 378 805 385 Q 795 388 780 382 Z" fill="#0f172a" />
+      <path d="M 778 382 Q 790 388 798 396 Q 788 398 775 390 Z" fill="#0f172a" />
+      <path d="M 772 388 Q 782 396 788 405 Q 778 406 768 396 Z" fill="#0f172a" />
+
+      <!-- Back arm (partially visible) -->
+      <path d="M 685 335 Q 700 350 715 362 L 720 358 Q 708 344 695 330 Z" fill="#e2e8f0" stroke="#334155" />
+    </g>
+
+    <!-- Neck, Throat & Skull (Acrocanthosaurus narrow theropod head) -->
+    <!-- Neck -->
+    <path d="M 740 232
+             C 765 240, 790 255, 815 270
+             C 805 285, 785 305, 745 320
+             C 730 280, 725 250, 740 232 Z"
+          fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+
+    <!-- Skull Structure: Narrow, elongated carnivorous theropod skull -->
+    <g id="skull-and-jaws" fill="#ffffff" stroke="#0f172a" stroke-width="2" stroke-linejoin="round">
+      <!-- Upper skull & snout -->
+      <path d="M 800 248
+               C 810 238, 835 230, 855 235
+               C 875 240, 895 248, 915 260
+               C 925 266, 928 274, 922 280
+               L 890 285
+               L 865 282
+               C 845 280, 835 275, 825 282
+               L 805 270 Z" />
+
+      <!-- Snout nostril -->
+      <ellipse cx="905" cy="265" rx="3.5" ry="2" fill="#0f172a" />
+
+      <!-- Ferocious eye ridge & eye -->
+      <path d="M 850 245 Q 860 242 870 248" fill="none" stroke="#0f172a" stroke-width="2.5" />
+      <circle cx="862" cy="252" r="3" fill="#0f172a" />
+      <circle cx="863" cy="251" r="1" fill="#ffffff" />
+
+      <!-- Lower Jaw (dropped in open roar showing teeth) -->
+      <path d="M 825 282
+               L 855 295
+               L 895 292
+               C 910 290, 915 296, 908 302
+               L 870 308
+               C 840 310, 825 300, 815 288 Z" />
+
+      <!-- Upper sharp conical teeth -->
+      <g fill="#0f172a" stroke="none">
+        <polygon points="915,274 912,282 917,282" />
+        <polygon points="907,276 904,285 910,285" />
+        <polygon points="898,278 895,288 901,288" />
+        <polygon points="890,280 887,289 893,289" />
+        <polygon points="882,281 879,289 885,289" />
+        <polygon points="874,281 871,288 877,288" />
+        <polygon points="866,281 863,287 869,287" />
+        <polygon points="858,281 855,286 861,286" />
+      </g>
+
+      <!-- Lower jaw teeth -->
+      <g fill="#0f172a" stroke="none">
+        <polygon points="904,295 901,288 906,290" />
+        <polygon points="896,295 893,288 898,290" />
+        <polygon points="888,296 885,289 890,291" />
+        <polygon points="880,297 877,290 882,292" />
+        <polygon points="872,298 869,291 874,293" />
+        <polygon points="864,299 861,293 866,294" />
+      </g>
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- EXAM LABELS & LEADER LINES EXACTLY MATCHING USER SCAN -->
+  <!-- ================================================================= -->
+
+  <!-- Top-Left Box: Label 7 (Spines / Sail / Body Heat) -->
+  <g id="label-7-group" transform="translate(60, 65)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" fill="#111827">
+      <tspan x="0" y="0">Dinosaur's name comes from spines.</tspan>
+      <tspan x="0" y="24">One theory: they were necessary</tspan>
+      <tspan x="0" y="48">to hold up a <tspan font-weight="bold" fill="#0f172a">7</tspan> ..................... which</tspan>
+      <tspan x="0" y="72">helped control body heat.</tspan>
+    </text>
+    <!-- Pointer line pointing toward the spines -->
+    <path d="M 330 65 Q 440 90 530 180" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" />
+    <circle cx="530" cy="180" r="4" fill="#0f172a" />
+  </g>
+
+  <!-- Top-Right Box: Label 8 (Skull narrow) -->
+  <g id="label-8-group" transform="translate(620, 95)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" fill="#111827">
+      <tspan x="0" y="0">Skull is <tspan font-weight="bold" fill="#0f172a">8</tspan> .....................</tspan>
+      <tspan x="0" y="24">compared with rest of body.</tspan>
+    </text>
+    <!-- Pointer line pointing to the skull -->
+    <path d="M 120 35 Q 180 80 235 150" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" />
+    <circle cx="235" cy="150" r="4" fill="#0f172a" />
+  </g>
+
+  <!-- Bottom-Left Box: Label 9 (Locomotion / wide tail & leg muscles) -->
+  <g id="label-9-group" transform="translate(45, 410)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" fill="#111827">
+      <tspan x="0" y="0"><tspan font-weight="bold" fill="#0f172a">9</tspan> ..................... made</tspan>
+      <tspan x="0" y="24">easier by wide tail</tspan>
+      <tspan x="0" y="48">and highly developed</tspan>
+      <tspan x="0" y="72">muscles in legs.</tspan>
+    </text>
+    <!-- Pointer line pointing toward tail and leg muscles -->
+    <path d="M 230 40 Q 320 30 380 -50" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" />
+    <circle cx="380" cy="-50" r="4" fill="#0f172a" />
+    <path d="M 230 70 Q 360 80 480 30" fill="none" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" />
+    <circle cx="480" cy="30" r="4" fill="#0f172a" />
+  </g>
+</svg>

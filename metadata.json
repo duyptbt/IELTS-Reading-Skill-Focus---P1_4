@@ -1,0 +1,8 @@
+{
+  "name": "IELTS Reading Skill Focus - P1_4",
+  "description": "Interactive IELTS Reading practice, test simulation, and skill consolidation for Reading Passage 1: Walking with dinosaurs (Questions 1-13).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
