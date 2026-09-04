@@ -260,7 +260,7 @@ export const QuestionsView: React.FC<QuestionsViewProps> = ({
     );
   };
 
-  const renderDiagramSentenceWithInlineInput = (
+  const renderSentenceWithInlineInput = (
     q: QuestionItem,
     answer: string,
     isChecked: boolean,
@@ -272,6 +272,7 @@ export const QuestionsView: React.FC<QuestionsViewProps> = ({
     const regex = new RegExp(`\\b${q.questionNumber}\\s*\\.{3,}`);
     const match = q.prompt.match(regex);
 
+    const isMaxOne = q.maxWords === 1;
     const inputComponent = (
       <span className="inline-flex items-center gap-1.5 align-middle mx-1.5 my-1">
         <span className="shrink-0 w-6 h-6 rounded bg-[#0F172A] text-white text-xs font-bold inline-flex items-center justify-center shadow-xs select-none">
@@ -283,10 +284,12 @@ export const QuestionsView: React.FC<QuestionsViewProps> = ({
           disabled={isSubmitted && mode === 'test'}
           value={answer}
           onChange={(e) => onAnswerChange(q.id, e.target.value)}
-          placeholder="Type answer..."
+          placeholder={isMaxOne ? '1 word...' : 'Max 2 words...'}
           autoComplete="off"
           spellCheck={false}
-          className={`w-36 sm:w-48 px-3 py-1 text-sm rounded-lg border outline-none font-medium transition-all ${
+          className={`${
+            isMaxOne ? 'w-36 sm:w-48' : 'w-40 sm:w-56'
+          } px-3 py-1 text-sm rounded-lg border outline-none font-medium transition-all ${
             isChecked
               ? isCorrect
                 ? 'border-emerald-500 bg-emerald-50 text-emerald-950 ring-2 ring-emerald-200'
@@ -316,6 +319,238 @@ export const QuestionsView: React.FC<QuestionsViewProps> = ({
         {inputComponent}
         {after && renderHighlightedText(after, q.id)}
       </p>
+    );
+  };
+
+  const renderDiagramSentenceWithInlineInput = renderSentenceWithInlineInput;
+
+  const renderFlowchartQuestionCard = (stepNum: number, q: QuestionItem) => {
+    const answer = userAnswers[q.id] || '';
+    const wordCount = getWordCount(answer);
+    const maxWords = q.maxWords || 2;
+    const isOverLimit = wordCount > maxWords;
+    const isChecked = checkedQuestions[q.id] || (isSubmitted && mode === 'test');
+    const isCorrect = isChecked ? checkAnswerCorrectness(q, answer) : false;
+    const isFlagged = flaggedQuestions.has(q.id);
+    const showExplanation = openExplanations[q.id] || (isSubmitted && mode === 'test');
+    const showTip = openTips[q.id];
+    const showAdvice = openAdvices[q.id];
+
+    return (
+      <div
+        key={q.id}
+        id={`question-card-${q.id}`}
+        data-question-id={q.id}
+        className={`w-full rounded-xl border-2 transition-all p-3.5 sm:p-4 text-left shadow-xs ${
+          isChecked
+            ? isCorrect
+              ? 'bg-emerald-50/50 border-emerald-400 ring-1 ring-emerald-200'
+              : 'bg-rose-50/50 border-rose-400 ring-1 ring-rose-200'
+            : 'bg-white border-blue-200 hover:border-blue-400'
+        }`}
+      >
+        {/* Step Header: Step badge, Word count, Status & Flag */}
+        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-100">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
+              Step {stepNum} (Question {q.questionNumber})
+            </span>
+
+            {isChecked && (
+              isCorrect ? (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Correct</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md">
+                  <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Incorrect</span>
+                </span>
+              )
+            )}
+
+            <span className="text-[11px] text-slate-500">
+              Word count:{' '}
+              <strong className={isOverLimit ? 'text-rose-600 font-bold' : 'text-slate-700'}>
+                {wordCount}
+              </strong>
+              /{maxWords} max
+              {isOverLimit && (
+                <span className="text-rose-600 font-semibold ml-1">
+                  (Exceeds limit!)
+                </span>
+              )}
+            </span>
+          </div>
+
+          <button
+            id={`flag-q-${q.id}`}
+            onClick={() => onToggleFlag(q.id)}
+            title={isFlagged ? 'Remove flag' : 'Flag question for review'}
+            className={`p-1.5 rounded transition-colors cursor-pointer shrink-0 ${
+              isFlagged
+                ? 'text-amber-600 bg-amber-100 hover:bg-amber-200'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <Flag className="w-3.5 h-3.5 fill-current" />
+          </button>
+        </div>
+
+        {/* Question sentence with interactive inline input */}
+        <div className="py-0.5">
+          {renderSentenceWithInlineInput(
+            q,
+            answer,
+            isChecked,
+            isCorrect,
+            onAnswerChange,
+            isSubmitted,
+            mode
+          )}
+        </div>
+
+        {/* Practice Mode: Tip and Advice Buttons */}
+        {mode === 'practice' && (
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            {q.tip && (
+              <button
+                id={`tip-btn-q-${q.id}`}
+                onClick={() => toggleTip(q.id)}
+                className="flex items-center space-x-1.5 text-xs text-blue-700 hover:text-blue-900 font-medium py-0.5 px-2 rounded-md hover:bg-blue-50 transition-colors cursor-pointer"
+              >
+                <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                <span>{showTip ? 'Hide Question Tip' : 'Show Question Tip'}</span>
+              </button>
+            )}
+            {q.advice && (
+              <button
+                id={`advice-btn-q-${q.id}`}
+                onClick={() => toggleAdvice(q.id)}
+                className="flex items-center space-x-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-medium py-0.5 px-2 rounded-md hover:bg-indigo-50 transition-colors cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
+                <span>{showAdvice ? 'Hide Exam Advice' : 'Show Exam Advice'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {showTip && q.tip && (
+          <div className="mt-2 p-2.5 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-950 leading-relaxed animate-in fade-in space-y-1">
+            <p>
+              <strong className="text-blue-900">Tip (English): </strong>
+              {renderHighlightedText(q.tip, q.id)}
+            </p>
+            {explanationLanguage !== 'en' && q.tipVi && (
+              <p className="text-[11px] text-blue-800 pt-1 border-t border-blue-100/80">
+                <strong className="text-blue-900">🇻🇳 Mẹo làm bài: </strong>
+                {q.tipVi}
+              </p>
+            )}
+          </div>
+        )}
+
+        {showAdvice && q.advice && (
+          <div className="mt-2 p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-950 leading-relaxed animate-in fade-in space-y-1">
+            <p>
+              <strong className="text-indigo-900">Official Exam Advice: </strong>
+              {renderHighlightedText(q.advice, q.id)}
+            </p>
+            {explanationLanguage !== 'en' && q.adviceVi && (
+              <p className="text-[11px] text-indigo-800 pt-1 border-t border-indigo-100/80">
+                <strong className="text-indigo-900">🇻🇳 Lời khuyên giám khảo: </strong>
+                {q.adviceVi}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Practice Mode Controls: Check & Explanation Toggle */}
+        {mode === 'practice' && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
+            <button
+              id={`check-btn-q-${q.id}`}
+              onClick={() => handleCheckQuestion(q.id)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            >
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span>Check Answer</span>
+            </button>
+
+            <button
+              id={`explain-btn-q-${q.id}`}
+              onClick={() => toggleExplanation(q.id)}
+              className="flex items-center space-x-1 text-xs text-blue-700 hover:text-blue-900 font-semibold py-1 px-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
+            >
+              <span>{showExplanation ? 'Hide Explanation' : 'Show Explanation'}</span>
+              {showExplanation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        )}
+
+        {/* Detailed Explanation & Passage Evidence */}
+        {showExplanation && (
+          <div className="mt-3 p-3.5 rounded-lg bg-blue-50/60 border border-blue-200 text-xs text-slate-800 space-y-2.5 animate-in fade-in">
+            <div className="flex items-center justify-between pb-1.5 border-b border-blue-200/70">
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-slate-900">Official Answer:</span>
+                <span className="px-2 py-0.5 rounded font-mono font-bold bg-blue-100 text-blue-900 border border-blue-300">
+                  {q.officialAnswer}
+                </span>
+              </div>
+
+              <button
+                id={`locate-passage-q-${q.id}`}
+                onClick={() => onJumpToParagraph(q.paragraphRef)}
+                className="flex items-center space-x-1 text-blue-700 hover:text-blue-900 font-semibold px-2 py-0.5 rounded bg-white hover:bg-blue-100/50 border border-blue-200 transition-colors cursor-pointer"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                <span>Paragraph {q.paragraphRef}</span>
+                <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
+
+            <div>
+              <span className="font-semibold text-slate-700">Passage Evidence: </span>
+              <span className="italic bg-yellow-100 px-1 py-0.5 rounded text-slate-900 font-serif">
+                "{renderHighlightedText(q.paragraphQuote, q.id)}"
+              </span>
+            </div>
+
+            {q.distraction && (
+              <div className="p-2 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11.5px]">
+                <strong>Distraction Analysis: </strong>
+                {q.distraction}
+                {explanationLanguage !== 'en' && q.distractionVi && (
+                  <p className="mt-1 text-[11px] text-amber-800 italic">
+                    🇻🇳 {q.distractionVi}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {(explanationLanguage === 'en' || explanationLanguage === 'bilingual') && (
+              <div className="text-slate-700 leading-relaxed font-sans pt-1">
+                <strong className="text-slate-900">Explanation (EN): </strong>
+                {renderHighlightedText(q.explanation, q.id)}
+              </div>
+            )}
+
+            {(explanationLanguage === 'vi' || explanationLanguage === 'bilingual') && q.explanationVi && (
+              <div className="p-2.5 rounded-md bg-white border border-blue-200/80 text-slate-800 leading-relaxed">
+                <span className="font-bold text-blue-900 flex items-center gap-1 mb-1">
+                  <span>🇻🇳 Giải thích chi tiết:</span>
+                </span>
+                <p className="text-[12px] text-slate-700">
+                  {renderHighlightedText(q.explanationVi, q.id)}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -1232,330 +1467,64 @@ export const QuestionsView: React.FC<QuestionsViewProps> = ({
             )}
 
             {/* Visual Connected Flow-Chart Container */}
-            <div className="bg-slate-50 border-2 border-slate-300 rounded-2xl p-5 shadow-xs space-y-3">
+            <div className="bg-slate-50 border-2 border-slate-300 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
               <div className="text-center pb-2 border-b border-slate-200">
-                <h4 className="text-base font-extrabold text-slate-900 tracking-tight">
+                <h4 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
                   Peter Falkingham's computer model
                 </h4>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
                   Sequential experimental pipeline for digital mud simulation (Paragraph 6)
                 </p>
               </div>
 
-              {/* Sequential Flow Boxes */}
-              <div className="flex flex-col items-center space-y-2 max-w-xl mx-auto pt-2">
+              {/* Sequential Flow Boxes with embedded questions */}
+              <div className="flex flex-col items-center space-y-2 max-w-2xl mx-auto pt-2">
                 {/* Flow Step 1 (Question 10) */}
-                <div className="w-full bg-white border-2 border-blue-300 rounded-xl p-3.5 text-center shadow-xs">
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">
-                    Step 1 (Question 10)
-                  </span>
-                  <p className="text-xs font-semibold text-slate-800">
-                    Mud is simulated with attention to its texture and thickness and how much{' '}
-                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-300 rounded font-bold text-blue-700">
-                      10 .....................
-                    </span>{' '}
-                    it contains.
-                  </p>
-                </div>
+                {QUESTIONS.find((q) => q.id === 10) &&
+                  renderFlowchartQuestionCard(1, QUESTIONS.find((q) => q.id === 10)!)}
 
-                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0" />
+                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0 my-1" />
 
                 {/* Flow Step 2 (Fixed Step) */}
-                <div className="w-full bg-slate-100 border border-slate-300 rounded-xl p-3 text-center">
-                  <p className="text-xs font-medium text-slate-700">
+                <div className="w-full bg-slate-100/90 border border-slate-300 rounded-xl p-3.5 text-center shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                    Step 2 (Fixed Stage)
+                  </span>
+                  <p className="text-xs sm:text-sm font-medium text-slate-700">
                     A virtual foot produces a footprint in the mud.
                   </p>
                 </div>
 
-                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0" />
+                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0 my-1" />
 
                 {/* Flow Step 3 (Fixed Step) */}
-                <div className="w-full bg-slate-100 border border-slate-300 rounded-xl p-3 text-center">
-                  <p className="text-xs font-medium text-slate-700">
+                <div className="w-full bg-slate-100/90 border border-slate-300 rounded-xl p-3.5 text-center shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                    Step 3 (Fixed Stage)
+                  </span>
+                  <p className="text-xs sm:text-sm font-medium text-slate-700">
                     The footprint is dissected and examined from all angles.
                   </p>
                 </div>
 
-                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0" />
+                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0 my-1" />
 
                 {/* Flow Step 4 (Question 11) */}
-                <div className="w-full bg-white border-2 border-blue-300 rounded-xl p-3.5 text-center shadow-xs">
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">
-                    Step 4 (Question 11)
-                  </span>
-                  <p className="text-xs font-semibold text-slate-800">
-                    Levels of{' '}
-                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-300 rounded font-bold text-blue-700">
-                      11 .....................
-                    </span>{' '}
-                    are measured within the footprint.
-                  </p>
-                </div>
+                {QUESTIONS.find((q) => q.id === 11) &&
+                  renderFlowchartQuestionCard(4, QUESTIONS.find((q) => q.id === 11)!)}
 
-                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0" />
+                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0 my-1" />
 
                 {/* Flow Step 5 (Question 12) */}
-                <div className="w-full bg-white border-2 border-blue-300 rounded-xl p-3.5 text-center shadow-xs">
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">
-                    Step 5 (Question 12)
-                  </span>
-                  <p className="text-xs font-semibold text-slate-800">
-                    Multiple simulations relate footprints to different types of{' '}
-                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-300 rounded font-bold text-blue-700">
-                      12 .....................
-                    </span>
-                  </p>
-                </div>
+                {QUESTIONS.find((q) => q.id === 12) &&
+                  renderFlowchartQuestionCard(5, QUESTIONS.find((q) => q.id === 12)!)}
 
-                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0" />
+                <ArrowDown className="w-4 h-4 text-slate-400 shrink-0 my-1" />
 
                 {/* Flow Step 6 (Question 13) */}
-                <div className="w-full bg-white border-2 border-blue-300 rounded-xl p-3.5 text-center shadow-xs">
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block mb-1">
-                    Step 6 (Question 13)
-                  </span>
-                  <p className="text-xs font-semibold text-slate-800">
-                    More accurate interpretation of{' '}
-                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-300 rounded font-bold text-blue-700">
-                      13 .....................
-                    </span>{' '}
-                    is possible.
-                  </p>
-                </div>
+                {QUESTIONS.find((q) => q.id === 13) &&
+                  renderFlowchartQuestionCard(6, QUESTIONS.find((q) => q.id === 13)!)}
               </div>
-            </div>
-
-            {/* Questions 10-13 Items */}
-            <div className="space-y-4">
-              {part3Questions.map((q) => {
-                const answer = userAnswers[q.id] || '';
-                const wordCount = getWordCount(answer);
-                const isOverLimit = wordCount > 2;
-                const isChecked = checkedQuestions[q.id] || (isSubmitted && mode === 'test');
-                const isCorrect = isChecked ? checkAnswerCorrectness(q, answer) : false;
-                const isFlagged = flaggedQuestions.has(q.id);
-                const showExplanation = openExplanations[q.id] || (isSubmitted && mode === 'test');
-                const showTip = openTips[q.id];
-                const showAdvice = openAdvices[q.id];
-
-                return (
-                  <div
-                    key={q.id}
-                    id={`question-card-${q.id}`}
-                    data-question-id={q.id}
-                    className={`p-4 sm:p-5 rounded-xl border transition-all ${
-                      isChecked
-                        ? isCorrect
-                          ? 'bg-emerald-50/50 border-emerald-300 ring-1 ring-emerald-200'
-                          : 'bg-rose-50/50 border-rose-300 ring-1 ring-rose-200'
-                        : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
-                    }`}
-                  >
-                    {/* Card Header: Number, Prompt, and Flag */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start space-x-3 flex-1">
-                        <span className="shrink-0 w-6 h-6 rounded bg-[#0F172A] text-white text-xs font-bold flex items-center justify-center shadow-xs">
-                          {q.questionNumber}
-                        </span>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-slate-900 leading-snug">
-                            {renderHighlightedText(q.prompt, q.id)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-1.5">
-                        <button
-                          id={`flag-q-${q.id}`}
-                          onClick={() => onToggleFlag(q.id)}
-                          title={isFlagged ? 'Remove flag' : 'Flag question for review'}
-                          className={`p-1.5 rounded transition-colors cursor-pointer ${
-                            isFlagged
-                              ? 'text-amber-600 bg-amber-100 hover:bg-amber-200'
-                              : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          <Flag className="w-3.5 h-3.5 fill-current" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Question Specific Tip & Official Advice (Practice Mode) */}
-                    {mode === 'practice' && (
-                      <div className="mt-2.5 flex flex-wrap gap-2">
-                        {q.tip && (
-                          <button
-                            id={`tip-btn-q-${q.id}`}
-                            onClick={() => toggleTip(q.id)}
-                            className="flex items-center space-x-1.5 text-xs text-blue-700 hover:text-blue-900 font-medium py-0.5 px-2 rounded-md hover:bg-blue-50 transition-colors cursor-pointer"
-                          >
-                            <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                            <span>{showTip ? 'Hide Question Tip' : 'Show Question Tip'}</span>
-                          </button>
-                        )}
-                        {q.advice && (
-                          <button
-                            id={`advice-btn-q-${q.id}`}
-                            onClick={() => toggleAdvice(q.id)}
-                            className="flex items-center space-x-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-medium py-0.5 px-2 rounded-md hover:bg-indigo-50 transition-colors cursor-pointer"
-                          >
-                            <HelpCircle className="w-3.5 h-3.5 text-indigo-500" />
-                            <span>{showAdvice ? 'Hide Exam Advice' : 'Show Exam Advice'}</span>
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {showTip && q.tip && (
-                      <div className="mt-2 p-2.5 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-950 leading-relaxed animate-in fade-in space-y-1">
-                        <p>
-                          <strong className="text-blue-900">Tip (English): </strong>
-                          {renderHighlightedText(q.tip, q.id)}
-                        </p>
-                        {explanationLanguage !== 'en' && q.tipVi && (
-                          <p className="text-[11px] text-blue-800 pt-1 border-t border-blue-100/80">
-                            <strong className="text-blue-900">🇻🇳 Mẹo làm bài: </strong>
-                            {q.tipVi}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {showAdvice && q.advice && (
-                      <div className="mt-2 p-2.5 rounded-lg bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-950 leading-relaxed animate-in fade-in space-y-1">
-                        <p>
-                          <strong className="text-indigo-900">Official Exam Advice: </strong>
-                          {renderHighlightedText(q.advice, q.id)}
-                        </p>
-                        {explanationLanguage !== 'en' && q.adviceVi && (
-                          <p className="text-[11px] text-indigo-800 pt-1 border-t border-indigo-100/80">
-                            <strong className="text-indigo-900">🇻🇳 Lời khuyên giám khảo: </strong>
-                            {q.adviceVi}
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Input Field */}
-                    <div className="mt-3">
-                      <div className="relative">
-                        <input
-                          id={`input-q-${q.id}`}
-                          type="text"
-                          disabled={isSubmitted && mode === 'test'}
-                          value={answer}
-                          onChange={(e) => onAnswerChange(q.id, e.target.value)}
-                          placeholder="Type NO MORE THAN TWO WORDS..."
-                          className={`w-full px-3.5 py-2 text-sm rounded-lg border outline-none transition-all ${
-                            isChecked
-                              ? isCorrect
-                                ? 'border-emerald-500 bg-emerald-50/30 text-emerald-950 font-medium'
-                                : 'border-rose-500 bg-rose-50/30 text-rose-950 font-medium'
-                              : 'border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 bg-slate-50/50 hover:bg-white text-slate-900'
-                          }`}
-                        />
-                      </div>
-
-                      {/* Word count feedback */}
-                      <div className="flex items-center justify-between text-[11px] mt-1.5 text-slate-500">
-                        <span>
-                          Word count: <strong className={isOverLimit ? 'text-rose-600 font-bold' : 'text-slate-800'}>{wordCount}</strong> / 2 max
-                        </span>
-                        {isOverLimit && (
-                          <span className="text-rose-600 font-semibold flex items-center space-x-1">
-                            <Info className="w-3 h-3" />
-                            <span>Warning: Exceeds 2-word limit!</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Practice Mode Controls & Feedback */}
-                    {mode === 'practice' && (
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                        <button
-                          id={`check-btn-q-${q.id}`}
-                          onClick={() => handleCheckQuestion(q.id)}
-                          className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5" />
-                          <span>Check Answer</span>
-                        </button>
-
-                        <button
-                          id={`explain-btn-q-${q.id}`}
-                          onClick={() => toggleExplanation(q.id)}
-                          className="flex items-center space-x-1 text-xs text-blue-700 hover:text-blue-900 font-semibold py-1 px-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
-                        >
-                          <span>{showExplanation ? 'Hide Explanation' : 'Show Explanation'}</span>
-                          {showExplanation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Detailed Explanation & Distraction Notes */}
-                    {showExplanation && (
-                      <div className="mt-3 p-3.5 rounded-lg bg-blue-50/60 border border-blue-200 text-xs text-slate-800 space-y-2.5 animate-in fade-in">
-                        <div className="flex items-center justify-between pb-1.5 border-b border-blue-200/70">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-slate-900">Official Answer:</span>
-                            <span className="px-2 py-0.5 rounded font-mono font-bold bg-blue-100 text-blue-900 border border-blue-300">
-                              {q.officialAnswer}
-                            </span>
-                          </div>
-
-                          <button
-                            id={`locate-passage-q-${q.id}`}
-                            onClick={() => onJumpToParagraph(q.paragraphRef)}
-                            className="flex items-center space-x-1 text-blue-700 hover:text-blue-900 font-semibold px-2 py-0.5 rounded bg-white hover:bg-blue-100/50 border border-blue-200 transition-colors cursor-pointer"
-                          >
-                            <BookOpen className="w-3 h-3 text-blue-600" />
-                            <span>Paragraph {q.paragraphRef}</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </button>
-                        </div>
-
-                        <div>
-                          <span className="font-semibold text-slate-700">Passage Evidence: </span>
-                          <span className="italic bg-yellow-100 px-1 py-0.5 rounded text-slate-900 font-serif">
-                            "{renderHighlightedText(q.paragraphQuote, q.id)}"
-                          </span>
-                        </div>
-
-                        {q.distraction && (
-                          <div className="p-2 rounded bg-amber-50 border border-amber-200 text-amber-900 text-[11.5px]">
-                            <strong>Distraction Analysis: </strong>
-                            {q.distraction}
-                            {explanationLanguage !== 'en' && q.distractionVi && (
-                              <p className="mt-1 text-[11px] text-amber-800 italic">
-                                🇻🇳 {q.distractionVi}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        {(explanationLanguage === 'en' || explanationLanguage === 'bilingual') && (
-                          <div className="text-slate-700 leading-relaxed font-sans pt-1">
-                            <strong className="text-slate-900">Explanation (EN): </strong>
-                            {renderHighlightedText(q.explanation, q.id)}
-                          </div>
-                        )}
-
-                        {(explanationLanguage === 'vi' || explanationLanguage === 'bilingual') && q.explanationVi && (
-                          <div className="p-2.5 rounded-md bg-white border border-blue-200/80 text-slate-800 leading-relaxed">
-                            <span className="font-bold text-blue-900 flex items-center gap-1 mb-1">
-                              <span>🇻🇳 Giải thích chi tiết:</span>
-                            </span>
-                            <p className="text-[12px] text-slate-700">
-                              {renderHighlightedText(q.explanationVi, q.id)}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </div>
         )}
